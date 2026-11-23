@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF to CDR converter</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%229%22 fill=%22none%22 stroke=%22%2315171a%22 stroke-width=%222%22/%3E%3Cpath d=%22M16 2v28M2 16h28%22 stroke=%22%2315171a%22 stroke-width=%222%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%223.5%22 fill=%22%23e5007d%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="top band">
+  <a class="brand" href="#top" aria-label="pdf2cdr home">
+    <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><circle cx="16" cy="16" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 2v28M2 16h28" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="16" r="3.5" fill="var(--magenta)"/></svg>
+    <span>pdf2cdr</span>
+  </a>
+  <p class="privacy">Runs in your browser. Your PDF never leaves this device.</p>
+</header>
+
+<main id="top">
+  <section class="intro band">
+    <h1>Turn PDF pages into editable CorelDRAW drawings</h1>
+    <p class="lede">Drop a PDF and get a <b>.cdr</b> file with real curves, fills, outlines, gradients, transparency, images and layers. It converts page by page, and text comes across as curves.</p>
+  </section>
+
+  <section class="table band" aria-label="Converter">
+    <div class="desk">
+      <aside class="controls">
+        <label class="drop" id="drop" tabindex="0">
+          <input type="file" id="file" accept="application/pdf,.pdf" hidden>
+          <svg viewBox="0 0 48 48" width="40" height="40" aria-hidden="true"><path d="M14 6h14l10 10v26H14z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 6v10h10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M26 22v14m-6-6 6 6 6-6" fill="none" stroke="var(--cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="drop-main">Drop a PDF here</span>
+          <span class="drop-sub">or click to choose a file</span>
+        </label>
+
+        <div class="file" id="fileInfo" hidden>
+          <div class="file-name" id="fileName"></div>
+          <div class="file-meta" id="fileMeta"></div>
+        </div>
+
+        <form class="opts" id="opts">
+          <div class="field">
+            <label for="pages">Pages</label>
+            <input id="pages" name="pages" placeholder="All pages, or e.g. 1-3, 5" autocomplete="off">
+            <p class="hint" id="pagesHint"></p>
+          </div>
+          <label class="check"><input type="checkbox" id="hidden" checked> <span>Keep hidden PDF layers <small>(imported as hidden CorelDRAW layers)</small></span></label>
+          <label class="check"><input type="checkbox" id="compress" checked> <span>Compress like CorelDRAW <small>(smaller file)</small></span></label>
+          <div class="field" id="pwField" hidden>
+            <label for="pw">Password</label>
+            <input id="pw" type="password" autocomplete="off">
+            <p class="hint" id="pwHint"></p>
+          </div>
+          <button class="btn ghost" id="reconvert" type="submit">Convert again</button>
+        </form>
+
+        <div class="progress" id="progress" hidden><div class="bar" id="bar"></div><span id="progressText">Converting…</span></div>
+
+        <button class="btn primary" id="download" type="button" disabled>Download .cdr</button>
+        <p class="hint" id="dlHint"></p>
+      </aside>
+
+      <div class="proof">
+        <div class="sheet-wrap" id="sheetWrap">
+          <div class="sheet" id="sheet"><div class="empty">Converting the sample flyer…</div></div>
+          <i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+        </div>
+        <div class="pager" id="pager" hidden>
+          <button class="btn icon" id="prev" type="button" aria-label="Previous page">‹</button>
+          <span id="pageLabel">Page 1 of 1</span>
+          <button class="btn icon" id="next" type="button" aria-label="Next page">›</button>
+        </div>
+        <p class="proof-note">Preview of the converted drawing, before it is written to .cdr.</p>
+      </div>
+
+      <aside class="report" aria-live="polite">
+        <h2>Conversion report</h2>
+        <dl class="stats" id="stats"></dl>
+        <h3>Layers on this page</h3>
+        <ul class="layers" id="layers"><li class="muted">None yet</li></ul>
+        <h3>Notes</h3>
+        <ul class="notes" id="notes"><li class="muted">None yet</li></ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="how band">
+    <h2>How the conversion works</h2>
+    <p class="sub">The converter works in four stages, all running in your browser.</p>
+    <ol class="steps">
+      <li><span class="n" style="--c:var(--cyan)"></span><h3>Parse the file</h3><p>Cross-reference tables and streams, object streams, compression filters, fonts and images are decoded by pdf.js.</p></li>
+      <li><span class="n" style="--c:var(--magenta)"></span><h3>Interpret each page</h3><p>A table maps every drawing operator (move, line, curve, fill, clip, text, image) to a handler, with a graphics-state stack.</p></li>
+      <li><span class="n" style="--c:var(--yellow)"></span><h3>Build objects</h3><p>Handlers send paths, gradients, glyph outlines, bitmaps and layers to a canvas that collects editable objects. Clips are resolved and tiling patterns are expanded.</p></li>
+      <li><span class="n" style="--c:var(--key)"></span><h3>Write the .cdr</h3><p>Objects become CorelDRAW X5 records (<code>loda</code>, <code>fild</code>, <code>outl</code>, <code>trfd</code>) in a zlib-compressed RIFF stream inside the ZIP container.</p></li>
+    </ol>
+  </section>
+
+  <section class="carry band">
+    <h2>What comes across</h2>
+    <div class="scroll">
+      <table class="stack">
+        <thead><tr><th>PDF content</th><th>In the .cdr file</th></tr></thead>
+        <tbody>
+          <tr><td>Paths, rectangles, curves</td><td>Editable curve objects with exact Bézier nodes</td></tr>
+          <tr><td>Fills and outlines</td><td>Uniform fills and outlines: width, caps, joins and dashes</td></tr>
+          <tr><td>Axial and radial shadings</td><td>Linear and radial fountain fills. Two-circle shadings become simple radials</td></tr>
+          <tr><td>Constant opacity</td><td>Uniform transparency</td></tr>
+          <tr><td>Images and image masks</td><td>Bitmaps, with an alpha mask where the PDF has one</td></tr>
+          <tr><td>Text</td><td>Curves traced from the embedded glyph outlines. Invisible OCR text is skipped</td></tr>
+          <tr><td>Optional-content layers</td><td>Named CorelDRAW layers, and hidden ones stay hidden</td></tr>
+          <tr><td>Clipping paths</td><td>Applied to the shapes. Clipped strokes and images are kept whole</td></tr>
+          <tr><td>Tiling patterns</td><td>Expanded into tiles, up to 400 per fill</td></tr>
+          <tr><td>Blend modes and soft masks</td><td>Imported as normal blending without the mask</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="band foot">
+  <p>The output is a CorelDRAW X5-format document (version 1500). Files open in CorelDRAW 2026 (tested November 2026), and each record layout matches files CorelDRAW itself saves in that format. Output is also checked with libcdr, the open-source CDR reader used by LibreOffice and Inkscape. Built with pdf.js (Apache-2.0), fflate (MIT) and Clipper2 (Boost). Not affiliated with Corel.</p>
+</footer>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "pdf2cdr",
+  "version": "0.1.0",
+  "description": "Convert PDF pages into editable CorelDRAW (.cdr) drawings, in the browser or from the command line.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsx test/run-tests.ts",
+    "dev": "node scripts/copy-pdfjs-assets.mjs && vite",
+    "build": "node scripts/copy-pdfjs-assets.mjs && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "convert": "tsx bin/pdf2cdr.ts"
+  },
+  "keywords": [],
+  "author": "Shubh Patel",
+  "license": "MIT",
+  "dependencies": {
+    "clipper2-js": "^1.2.4",
+    "fflate": "^0.8.3",
+    "pdfjs-dist": "^6.5.438"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  },
+  "type": "module"
+}
