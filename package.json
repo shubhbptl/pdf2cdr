@@ -14,6 +14,7 @@
   "author": "Shubh Patel",
   "license": "MIT",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "clipper2-js": "^1.2.4",
     "fflate": "^0.8.3",
     "pdfjs-dist": "^6.5.438"

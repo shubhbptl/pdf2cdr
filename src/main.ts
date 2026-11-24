@@ -4,7 +4,6 @@ import { convert, countPages, parseRange, PasswordNeeded, type ConvertResult } f
 import { pageToSvg } from "./core/svg-preview";
 import type { SceneItem } from "./core/scene";
 import { buildSamplePdf } from "./app/sample-pdf";
-
 {
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const drop = $("drop"), fileInput = $<HTMLInputElement>("file");
@@ -25,6 +24,7 @@ import { buildSamplePdf } from "./app/sample-pdf";
   let busy = false;
   let hostDownloads: any = null; // claude.ai artifact host: downloads capability
 
+  
   // Table cell labels for the stacked phone layout.
   for (const table of document.querySelectorAll("table.stack")) {
     const heads = [...table.querySelectorAll("th")].map((th) => th.textContent ?? "");
